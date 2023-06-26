@@ -31,7 +31,7 @@ struct SingleResult: Codable {
     }
 }
 
-// local model
+// локальная модель данных для отображения
 struct ResultForDisplay {
     var title: String
     var description: String

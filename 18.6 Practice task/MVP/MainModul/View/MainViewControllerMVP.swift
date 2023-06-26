@@ -16,6 +16,7 @@ class MainViewControllerMVP: UIViewController {
     private lazy var mainTableView: UITableView = {
         let table = UITableView()
         table.dataSource = self
+        table.delegate = self
         return table
     }()
     
@@ -81,7 +82,7 @@ class MainViewControllerMVP: UIViewController {
 
 extension MainViewControllerMVP: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        presenter.getNumberOfRowsInSection(for: section)
+        presenter.getNumberOfRows(for: section)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -96,24 +97,15 @@ extension MainViewControllerMVP: UITableViewDataSource {
         var configuration = cell.defaultContentConfiguration()
         configuration.text = "\(result.title)"
         configuration.secondaryText = "\(result.description)"
-            
-        if let image = presenter.getImage(for: indexPath) {
-            configuration.image = image
-        } else {
-            presenter.loadImageAsync(for: indexPath) { image in
-                if let image = image {
-                    configuration.image = image
-                } else {
-                    configuration.image = UIImage(named: "No-Image-Placeholder")
-                }
-                
-                DispatchQueue.main.async {
-                    // для отображения изображения перезагружаем ячейку
-                    print("mainTableView.reloadRows - \(indexPath)")
-                    self.mainTableView.reloadRows(at: [indexPath], with: .none)
-                }
+        
+        let image = presenter.getOrLoadImage(for: indexPath) {
+            DispatchQueue.main.async {
+                // для отображения изображения перезагружаем ячейку
+                print("mainTableView.reloadRows - \(indexPath)")
+                self.mainTableView.reloadRows(at: [indexPath], with: .none)
             }
         }
+        configuration.image = image
 
         // установка максимального размера картинки в ячейке
         var imageProperties = configuration.imageProperties
@@ -121,6 +113,16 @@ extension MainViewControllerMVP: UITableViewDataSource {
         configuration.imageProperties = imageProperties
         
         cell.contentConfiguration = configuration
+    }
+}
+// MARK: - TableView Delegate
+
+extension MainViewControllerMVP: UITableViewDelegate {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let detailVC = DetailViewController()
+        let detailVCPresenter = DetailViewPresenter(about: presenter.getSearchResult(for: indexPath)!)
+        detailVC.presenter = detailVCPresenter
+        self.navigationController?.pushViewController(detailVC, animated: true)
     }
 }
 
@@ -136,13 +138,23 @@ extension MainViewControllerMVP: UISearchBarDelegate {
         // скрываем клавиатуру после нажатия
         searchBar.resignFirstResponder()
         
-        presenter.makeSearch(searchExpression: searchBar.text) { [weak self] in
-            DispatchQueue.main.async {
-                guard let self = self else { return }
-                print("mainTableView.reloadData()")
-                self.mainTableView.reloadData()
-                self.activityIndicator.stopAnimating()
-                self.mainSearchBar.searchTextField.leftView?.isHidden = false
+        presenter.makeSearch(searchExpression: searchBar.text) { [weak self] seccessFlag in
+            if !seccessFlag {
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    self.activityIndicator.stopAnimating()
+                    self.mainSearchBar.searchTextField.leftView?.isHidden = false
+                    print("An error occurred!")
+                }
+                return
+            } else {
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    print("mainTableView.reloadData()")
+                    self.mainTableView.reloadData()
+                    self.activityIndicator.stopAnimating()
+                    self.mainSearchBar.searchTextField.leftView?.isHidden = false
+                }
             }
         }
     }

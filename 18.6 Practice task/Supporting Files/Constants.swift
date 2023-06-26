@@ -5,7 +5,6 @@
 //  Created by Alex Aytov on 4/30/23.
 //
 
-import Foundation
 
 enum Constants {
     enum Titles {
