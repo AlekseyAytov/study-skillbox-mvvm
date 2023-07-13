@@ -7,7 +7,7 @@
 import UIKit
 
 protocol DetailViewPresenterProtocol {
-    init(about data: ResultForDisplay, image: UIImage?)
+    init(about data: ResultForDisplay)
     var model: ResultForDisplay { get }
     func getOrLoadImage(completion: (() -> Void)?) -> UIImage?
 }
@@ -17,9 +17,8 @@ class DetailViewPresenter: DetailViewPresenterProtocol {
     private var dataModel: ResultForDisplay
     private var image: UIImage?
     
-    required init(about data: ResultForDisplay, image: UIImage? = nil) {
+    required init(about data: ResultForDisplay) {
         self.dataModel = data
-        self.image = image
     }
 
     var model: ResultForDisplay {

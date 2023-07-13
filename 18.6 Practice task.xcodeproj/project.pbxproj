@@ -16,6 +16,7 @@
 		6BB671812A462744009D637C /* UImageExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB671802A462744009D637C /* UImageExtension.swift */; };
 		6BB6718B2A49B6C6009D637C /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB6718A2A49B6C6009D637C /* DetailViewController.swift */; };
 		6BB6718D2A49C36C009D637C /* DetailViewPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB6718C2A49C36C009D637C /* DetailViewPresenter.swift */; };
+		6BE0805B2A5C581C0019E8FA /* ModuleBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE0805A2A5C581C0019E8FA /* ModuleBuilder.swift */; };
 		6BE6482329F6B30700842160 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE6482229F6B30700842160 /* AppDelegate.swift */; };
 		6BE6482529F6B30700842160 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE6482429F6B30700842160 /* SceneDelegate.swift */; };
 		6BE6482729F6B30700842160 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BE6482629F6B30700842160 /* MainViewController.swift */; };
@@ -35,6 +36,7 @@
 		6BB671802A462744009D637C /* UImageExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UImageExtension.swift; sourceTree = "<group>"; };
 		6BB6718A2A49B6C6009D637C /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		6BB6718C2A49C36C009D637C /* DetailViewPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewPresenter.swift; sourceTree = "<group>"; };
+		6BE0805A2A5C581C0019E8FA /* ModuleBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleBuilder.swift; sourceTree = "<group>"; };
 		6BE6482229F6B30700842160 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6BE6482429F6B30700842160 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		6BE6482629F6B30700842160 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 				6BE6482829F6B30700842160 /* Main.storyboard */,
 				6BE6483029F6B30E00842160 /* Info.plist */,
 				6B564E2829F982740070A1B9 /* Model.swift */,
+				6BE0805A2A5C581C0019E8FA /* ModuleBuilder.swift */,
 			);
 			path = "18.6 Practice task";
 			sourceTree = "<group>";
@@ -247,6 +250,7 @@
 				6BB6717D2A44CAAB009D637C /* MainPresenter.swift in Sources */,
 				6B17415429FF016A008553B0 /* Constants.swift in Sources */,
 				6BB6718D2A49C36C009D637C /* DetailViewPresenter.swift in Sources */,
+				6BE0805B2A5C581C0019E8FA /* ModuleBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -81,6 +81,7 @@ class MainViewControllerMVP: UIViewController {
 // MARK: - TableView DataSource
 
 extension MainViewControllerMVP: UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         presenter.getNumberOfRows(for: section)
     }
@@ -118,10 +119,10 @@ extension MainViewControllerMVP: UITableViewDataSource {
 // MARK: - TableView Delegate
 
 extension MainViewControllerMVP: UITableViewDelegate {
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let detailVC = DetailViewController()
-        let detailVCPresenter = DetailViewPresenter(about: presenter.getSearchResult(for: indexPath)!)
-        detailVC.presenter = detailVCPresenter
+        let model = presenter.getSearchResult(for: indexPath)!
+        let detailVC = ModuleBuilder.createDetailModule(model)
         self.navigationController?.pushViewController(detailVC, animated: true)
     }
 }
