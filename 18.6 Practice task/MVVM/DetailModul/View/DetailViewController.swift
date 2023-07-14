@@ -9,17 +9,17 @@ import UIKit
 
 class DetailViewController: UIViewController {
     
-    var presenter: DetailViewPresenterProtocol!
+    var viewModel: DetailViewModelProtocol!
     
     private lazy var image: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .white
         imageView.contentMode = .scaleAspectFit
         // суть параметра completion в работе после загрузки картинки, если картинки нет
-        imageView.image = presenter.getOrLoadImage(completion: { [weak self] in
+        imageView.image = viewModel.getImage(completion: { [weak self] in
             guard let self = self else { return }
             DispatchQueue.main.async {
-                self.image.image = self.presenter.getOrLoadImage(completion: nil)
+                self.image.image = self.viewModel.getImage(completion: nil)
                 imageView.setNeedsDisplay()
             }
         })
@@ -28,7 +28,7 @@ class DetailViewController: UIViewController {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = presenter.model.title
+        label.text = viewModel.getResult().title
         label.numberOfLines = 0
         label.textAlignment = .center
         return label
@@ -36,9 +36,9 @@ class DetailViewController: UIViewController {
     
     private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
-        label.text = presenter.model.description
+        label.text = viewModel.getResult().description?.trimHTMLTags()
         label.numberOfLines = 0
-        label.textAlignment = .center
+        label.textAlignment = .justified
         return label
     }()
 
@@ -65,11 +65,13 @@ class DetailViewController: UIViewController {
         titleLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(image.snp.bottom).offset(20)
+            make.leading.trailing.equalToSuperview().inset(10)
         }
         
         descriptionLabel.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
             make.top.equalTo(titleLabel.snp.bottom).offset(20)
+            make.leading.trailing.equalToSuperview().inset(10)
         }
     }
 }

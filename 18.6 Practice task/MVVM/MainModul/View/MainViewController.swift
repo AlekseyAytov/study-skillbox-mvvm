@@ -1,26 +1,23 @@
 //
-//  ViewController.swift
+//  MainViewControllerMVP.swift
 //  18.6 Practice task
 //
-//  Created by Alex Aytov on 4/24/23.
+//  Created by Alex Aytov on 6/23/23.
 //
+
 import UIKit
 import SnapKit
 
 class MainViewController: UIViewController {
-    private let service = Service()
     
-    // результаты поиска
-    private var searchResults: [ResultForDisplay] = []
-    
-    // словарь для хранения изображений с измененными размерами
-    private var imagesCache: [IndexPath: UIImage] = [:]
+    var viewModel: MainViewModelProtocol!
     
     private var reuseCellIdentifier = "standartCell"
     
     private lazy var mainTableView: UITableView = {
         let table = UITableView()
         table.dataSource = self
+        table.delegate = self
         return table
     }()
     
@@ -45,6 +42,7 @@ class MainViewController: UIViewController {
     }()
 
     private func setupViews() {
+        view.backgroundColor = .white
         view.addSubview(mainTableView)
         view.addSubview(mainSearchBar)
         view.addSubview(aboutInfo)
@@ -84,8 +82,9 @@ class MainViewController: UIViewController {
 // MARK: - TableView DataSource
 
 extension MainViewController: UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        searchResults.count
+        viewModel.getSearchResults().count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -95,43 +94,40 @@ extension MainViewController: UITableViewDataSource {
     }
     
     private func configure(cell: inout UITableViewCell, for indexPath: IndexPath) {
-        if searchResults.isEmpty {
-            return
-        } else {
-            var configuration = cell.defaultContentConfiguration()
-            configuration.text = "\(searchResults[indexPath.row].title)"
-            configuration.secondaryText = "\(searchResults[indexPath.row].description)"
-            
-            if let image = imagesCache[indexPath] {
-                configuration.image = image
-            } else {
-                // если изображения для текущего indexPath в словаре imagesCache нет, то загружаем изображение
-                print("run service.loadImageAsync - \(indexPath)")
-                service.loadImageAsync(urlString: searchResults[indexPath.row].imageURLString) {imageData in
-                    
-                    if let imageData = imageData {
-                        // если загрузка изображения произошла, то заносим в словарь
-                        self.imagesCache[indexPath] = UIImage(data: imageData)!.scalePreservingAspectRatio(targetSize: CGSize(width: 100, height: 100))
-                    } else {
-                        // если загрузка изображения НЕ произошла, то заносим в словарь No-Image-Placeholder
-                        self.imagesCache[indexPath] = UIImage(named: "No-Image-Placeholder")
-                    }
-                    
-                    DispatchQueue.main.async {
-                        // для отображения изображения перезагружаем ячейку
-                        self.mainTableView.reloadRows(at: [indexPath], with: .none)
-                        print("ended service.loadImageAsync - \(indexPath)")
-                    }
-                }
-            }
-            
-            // установка максимального размера картинки в ячейке
-            var imageProperties = configuration.imageProperties
-            imageProperties.maximumSize = CGSize(width: 100, height: 100)
-            configuration.imageProperties = imageProperties
-            
-            cell.contentConfiguration = configuration
+        let result = viewModel.getSearchResults()[indexPath.row]
+        var configuration = cell.defaultContentConfiguration()
+        
+        var title = result.title
+        if let startYear = result.start?.prefix(4) {
+            title += " (\(startYear))"
         }
+        configuration.text = "\(title)"
+        
+        let ganres = result.genres.joined(separator: ", ")
+        configuration.secondaryText = "\(ganres)"
+                
+        configuration.image = viewModel.getImage(for: indexPath) {
+            // для отображения изображения перезагружаем ячейку
+            print("mainTableView.reloadRows - \(indexPath)")
+            self.mainTableView.reloadRows(at: [indexPath], with: .none)
+        }
+
+        // установка максимального размера картинки в ячейке
+        var imageProperties = configuration.imageProperties
+        imageProperties.maximumSize = CGSize(width: 100, height: 100)
+        configuration.imageProperties = imageProperties
+        
+        cell.contentConfiguration = configuration
+    }
+}
+// MARK: - TableView Delegate
+
+extension MainViewController: UITableViewDelegate {
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let model = viewModel.getSearchResults()[indexPath.row]
+        let detailVC = ModuleBuilder.createDetailModule(model)
+        self.navigationController?.pushViewController(detailVC, animated: true)
     }
 }
 
@@ -147,17 +143,14 @@ extension MainViewController: UISearchBarDelegate {
         // скрываем клавиатуру после нажатия
         searchBar.resignFirstResponder()
         
-        // Обнуляем результаты предыдущего запроса
-        searchResults = []
-        imagesCache = [:]
-        
-        service.getSearchResults(searchExpression: searchBar.text) { jsonData, error in
-            guard let data = jsonData,
-                  let networkModel = self.service.parseDecoder(data: data) else { return }
-            // преобразование networkModel в массив структур ResultForDisplay
-            self.searchResults = Array(networkModel.results.map{ResultForDisplay(networkModel: $0)})
-            
-            DispatchQueue.main.async {
+        viewModel.doSearch(searchExpression: searchBar.text) { [weak self] seccessFlag in
+            guard let self = self else { return }
+            if !seccessFlag {
+                self.activityIndicator.stopAnimating()
+                self.mainSearchBar.searchTextField.leftView?.isHidden = false
+                print("An error occurred!")
+            } else {
+                print("mainTableView.reloadData()")
                 self.mainTableView.reloadData()
                 self.activityIndicator.stopAnimating()
                 self.mainSearchBar.searchTextField.leftView?.isHidden = false
@@ -178,3 +171,4 @@ extension MainViewController: UISearchBarDelegate {
         searchBar.showsCancelButton = true
     }
 }
+

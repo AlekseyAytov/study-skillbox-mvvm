@@ -8,7 +8,7 @@
 
 enum Constants {
     enum Titles {
-        static var info = "Cервис для получения информации о фильмах, сериалах и актерском составе"
+        static var info = "Cервис для получения информации о сериалах"
         static var placeholder = "введите запрос..."
     }
 }
