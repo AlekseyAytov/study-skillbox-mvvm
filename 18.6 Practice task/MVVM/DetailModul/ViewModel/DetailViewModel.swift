@@ -12,22 +12,21 @@ protocol DetailViewModelProtocol {
     func getResult() -> ResultForDisplay
 }
 
-
 class DetailViewModel: DetailViewModelProtocol {
     private var result: ResultForDisplay
     var networkService: NetworkServiceProtocol
-    
+
     required init(networkService: NetworkServiceProtocol, result: ResultForDisplay) {
         self.result = result
         self.networkService = networkService
     }
-    
-    private var image: UIImage? = nil
-    
+
+    private var image: UIImage?
+
     func getResult() -> ResultForDisplay {
         return result
     }
-    
+
     // метод возвращает картинку либо асинхронно её загружает и сохраняет в переменную,
     // при повторном использованиии метода возвращает загруженную картинку
     func getImage(completion: (() -> Void)?) -> UIImage? {
@@ -39,7 +38,7 @@ class DetailViewModel: DetailViewModelProtocol {
                 return self.image
             }
             print(urlString)
-            
+
             networkService.loadImageAsync(urlString: urlString) { imageData in
                 DispatchQueue.main.async {
                     if let imageData = imageData {
@@ -53,7 +52,7 @@ class DetailViewModel: DetailViewModelProtocol {
         }
         return self.image
     }
-    
+
     private func setPlaceholderImage() {
         self.image = UIImage(named: "No-Image-Placeholder")
     }

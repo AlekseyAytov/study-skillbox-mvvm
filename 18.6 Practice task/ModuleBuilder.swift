@@ -15,13 +15,13 @@ protocol ModuleBuilderProtocol {
 class ModuleBuilder: ModuleBuilderProtocol {
     static func createMainModule() -> UIViewController {
         let viewController = MainViewController()
-        
+
         let networkService = NetworkService()
         let viewModel = MainViewModel(networkService: networkService)
         viewController.viewModel = viewModel
         return viewController
     }
-    
+
     static func createDetailModule(_ data: ResultForDisplay) -> UIViewController {
         let viewController = DetailViewController()
         let networkService = NetworkService()
